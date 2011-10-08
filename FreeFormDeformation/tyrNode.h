@@ -16,14 +16,14 @@ public:
 		int nFace = _ply.GetNumFaces();
 
 		for(int f = 0; f< nFace; f++){
-			tdio_library::vector3 pt[3];
+			tdio_library::Vector3 pt[3];
 			pt[0] = vtx[faces[f].verts[0]];
 			pt[1] = vtx[faces[f].verts[1]];
 			pt[2] = vtx[faces[f].verts[2]];
 			
-			tdio_library::vector3 edge1 = pt[1] - pt[0];
-			tdio_library::vector3 edge2 = pt[2] - pt[0];
-			tdio_library::vector3 normal = edge1.Cross(edge2);
+			tdio_library::Vector3 edge1 = pt[1] - pt[0];
+			tdio_library::Vector3 edge2 = pt[2] - pt[0];
+			tdio_library::Vector3 normal = edge1.Cross(edge2);
 			normal.Normalize();
 			
 			
@@ -62,14 +62,14 @@ public:
 
 	std::string getName(){return _name;}
 
-	void setOrientation(tdio_library::quaternion q){_localOrientation = q; _localOrientation.normalize(); update();}
-	void setPosition(tdio_library::vector3 v){_localPosition = v; update();}
+	void setOrientation(tdio_library::quaternion q){_localOrientation = q; _localOrientation.Normalize(); update();}
+	void setPosition(tdio_library::Vector3 v){_localPosition = v; update();}
 
 	tdio_library::quaternion getGlobalOrientation(){return _globalOrientation;}
 	tdio_library::quaternion getLocalOrientation(){return _localOrientation;}
 
-	tdio_library::vector3 getGlobalPosition(){return _globalPosition;}
-	tdio_library::vector3 getLocalPosition(){return _localPosition;}
+	tdio_library::Vector3 getGlobalPosition(){return _globalPosition;}
+	tdio_library::Vector3 getLocalPosition(){return _localPosition;}
 
 	void setParent(tyrNode *node){_parent = node;}
 	void setColor(tdio_library::rgb_l c){_color = c;}	
@@ -77,7 +77,7 @@ public:
 
 	void render(double dt);
 
-	void translate(const tdio_library::vector3& v,Rotation_Center r = RC_PARENT);
+	void translate(const tdio_library::Vector3& v,Rotation_Center r = RC_PARENT);
 	void rotate(const tdio_library::quaternion& q,Rotation_Center r = RC_PARENT);
 
 	void update();
@@ -90,8 +90,8 @@ private:
 	tdio_library::quaternion _localOrientation;
 	tdio_library::quaternion _globalOrientation;
 
-	tdio_library::vector3 _localPosition;
-	tdio_library::vector3 _globalPosition;
+	tdio_library::Vector3 _localPosition;
+	tdio_library::Vector3 _globalPosition;
 
 	tyrNode *_parent;
 	std::vector<tyrNode *> _childNodes;

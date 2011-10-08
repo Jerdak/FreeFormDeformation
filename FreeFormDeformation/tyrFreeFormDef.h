@@ -9,7 +9,7 @@
 ///Coordinate in s,t,u space.
 class RectCoord {
 public:
-	RectCoord():s(0.0),t(0.0),u(0.0),p(tdio_library::vector3(0.0,0.0,0.0)),p0(tdio_library::vector3(0.0,0.0,0.0)){}
+	RectCoord():s(0.0),t(0.0),u(0.0),p(tdio_library::Vector3(0.0,0.0,0.0)),p0(tdio_library::Vector3(0.0,0.0,0.0)){}
 	RectCoord(const RectCoord &r){*this = r;}
 
 	void operator=(const RectCoord &r){
@@ -31,40 +31,40 @@ public:
 	double bernPolyPack[6][6][3];
 
 	///Point after applying s,t,u to p0, should result in original point
-	tdio_library::vector3 p;
+	tdio_library::Vector3 p;
 
 	///Origin
-	tdio_library::vector3 p0;
+	tdio_library::Vector3 p0;
 	
 	///Distances along S/T/U axes
 	double s,t,u;
 };
-class vector3_pathd : public tdio_library::vector3 {
+class vector3_pathd : public tdio_library::Vector3 {
 public:
 	vector3_pathd():bPath(false){}
 	~vector3_pathd(){}
 
-	tdio_library::vector3 getPoint(double dt){
+	tdio_library::Vector3 getPoint(double dt){
 		if(bPath){
-			tdio_library::vector3 ret;
+			tdio_library::Vector3 ret;
 			double offset;
 			_path.getPoint(dt,ret,offset);
 			
 			return ret;
 		} else {
-			return tdio_library::vector3(x,y,z);
+			return tdio_library::Vector3(x,y,z);
 		}
 	}
 	void update(double dt){
 		if(bPath){
-			tdio_library::vector3 ret;
+			tdio_library::Vector3 ret;
 			double offset;
 			_path.getPoint(dt,ret,offset,0,1);
 			*this = ret;
 		} 
 	}
-	tdio_library::vector3 getVec()const{return vector3(x,y,z);}
-	void operator=(const tdio_library::vector3 &v){
+	tdio_library::Vector3 getVec()const{return Vector3(x,y,z);}
+	void operator=(const tdio_library::Vector3 &v){
 		x = v.x;
 		y = v.y;
 		z = v.z;
@@ -81,7 +81,7 @@ public:
 	}
 	bool bPath;
 	Tyr::tyrPather _path;
-	tdio_library::vector3 originalVec;
+	tdio_library::Vector3 originalVec;
 };
 class tyrFreeFormDef : public tyrObject
 {
@@ -98,19 +98,19 @@ public:
 	/*Get control poiint*/
 	bool getControlPoint(int i,int j,int k);
 	
-	std::vector<tdio_library::vector3> *getModifiedVertices(){return &vtxTransform;}
+	std::vector<tdio_library::Vector3> *getModifiedVertices(){return &vtxTransform;}
 		
 	/*Set control point*/
-	bool setControlPoint(int i,int j,int k,tdio_library::vector3 v);
+	bool setControlPoint(int i,int j,int k,tdio_library::Vector3 v);
 	
 	/*Translate control point*/
-	bool transControlPoint(int i,int j,int k,tdio_library::vector3 v);
+	bool transControlPoint(int i,int j,int k,tdio_library::Vector3 v);
 
 	/*Apply bezier interpolation to original points*/
 	void transformVertices();
 
 	/*OpenGL rendering call*/
-	void render(double dt);
+	void render(double dt,bool bDrawControls = false);
 
 	/*Update the animation sequence*/
 	void updateAnimation(double dt);
@@ -128,19 +128,19 @@ protected:
 private:
 
 	///Reparameterize the vertices in to s,t,u space (position related to global axes)
-	void reParamVertices(std::vector<RectCoord> &param, tdio_library::vector3 &S,tdio_library::vector3 &T, tdio_library::vector3 &U);
+	void reParamVertices(std::vector<RectCoord> &param, tdio_library::Vector3 &S,tdio_library::Vector3 &T, tdio_library::Vector3 &U);
 	
 	///Get global vertice through Bezier interpolation
-	tdio_library::vector3 getGlobalVertice(RectCoord &r,tdio_library::vector3 &S,tdio_library::vector3 &T,tdio_library::vector3 &U);
+	tdio_library::Vector3 getGlobalVertice(RectCoord &r,tdio_library::Vector3 &S,tdio_library::Vector3 &T,tdio_library::Vector3 &U);
 	
 	///Create a new control point
-	tdio_library::vector3 createControlPoint(tdio_library::vector3 p0,int i,int j, int k,const tdio_library::vector3 &S,const tdio_library::vector3 &T,const tdio_library::vector3 &U);
+	tdio_library::Vector3 createControlPoint(tdio_library::Vector3 p0,int i,int j, int k,const tdio_library::Vector3 &S,const tdio_library::Vector3 &T,const tdio_library::Vector3 &U);
 
 	///Raw ply data
 	tdio_library::Object<tdio_library::PLY> _ply;
 	
 	///World axes (don't have to be orthogonal but we use them as such)
-	tdio_library::vector3 S,T,U;
+	tdio_library::Vector3 S,T,U;
 
 	///Control points
 	vector3_pathd controlPoints[6][6][6];
@@ -149,7 +149,7 @@ private:
 	std::vector<RectCoord> vtxParam;
 
 	///Bezier transformed vertices
-	std::vector<tdio_library::vector3> vtxTransform;
+	std::vector<tdio_library::Vector3> vtxTransform;
 	
 	///Max range along S,T,U axes
 	int l,m,n;

@@ -1,5 +1,6 @@
+#include "stdafx.h"
 #include "tyrFreeFormDef.h"
-#include <glut.h>
+
 
 using namespace tdio_library;
 using namespace std;
@@ -25,8 +26,8 @@ void tyrFreeFormDef::dbgPaths(){
 	for(int i = tl[0]; i <= tl[1]; i++){
 		for(int j = tm[0]; j <= tm[1]; j++){
 			for(int k=tn[0]; k <= tn[1]; k++){
-				vector3 dir =controlPoints[i][j][k].getVec();
-				vector3 dest;
+				Vector3 dir =controlPoints[i][j][k].getVec();
+				Vector3 dest;
 
 				dir.y = 0.0f;
 				Ray ray(controlPoints[i][j][k],dir);
@@ -60,12 +61,13 @@ bool tyrFreeFormDef::loadPly(const std::string file){
 	printf("  - T[%f %f %f]\n",T.x,T.y,T.z);
 	printf("  - U[%f %f %f]\n",U.x,U.y,U.z);
 
+	transformVertices();
 	return true;
 }
 void tyrFreeFormDef::transformVertices(){
 	vtxTransform.clear();
 	for(int i = 0; i < vtxParam.size(); i++){
-		vector3 P = getGlobalVertice(vtxParam[i],S,T,U);
+		Vector3 P = getGlobalVertice(vtxParam[i],S,T,U);
 		vtxTransform.push_back(P);
 	}
 }
@@ -94,26 +96,26 @@ double tyrFreeFormDef::bern_poly(int n, int v, double x){
 	///bernstein polynomial expansion (currently only supports ranges of 0 to 4)
 	return binom_coeff4(v) * pow(x,(double)v) *  pow((1.0f-x),(double)(n-v));
 }
-vector3 tyrFreeFormDef::createControlPoint(vector3 p0,int i,int j, int k,const vector3 &S,const vector3 &T,const vector3 &U){
+Vector3 tyrFreeFormDef::createControlPoint(Vector3 p0,int i,int j, int k,const Vector3 &S,const Vector3 &T,const Vector3 &U){
 	double tl = (double)l;
 	double tm = (double)m;
 	double tn =	(double)n;
 	
-	vector3 tmpT = T;
+	Vector3 tmpT = T;
 	return p0 + ((double)i/tl * S) + ((double)j/tm * T) + ((double)k/tn * U);
 }
-vector3 tyrFreeFormDef::getGlobalVertice(RectCoord &r,vector3 &S,vector3 &T,vector3 &U){
+Vector3 tyrFreeFormDef::getGlobalVertice(RectCoord &r,Vector3 &S,Vector3 &T,Vector3 &U){
 	double s = r.s;
 	double t = r.t;
 	double u = r.u;
 
-	vector3 tS(0.0f,0.0f,0.0f);
+	Vector3 tS(0.0f,0.0f,0.0f);
 	for(int i = 0; i <= l; i++){
 		
-		vector3 tM(0.0f,0.0f,0.0f);
+		Vector3 tM(0.0f,0.0f,0.0f);
 		for(int j = 0; j <= m; j++){
 			
-			vector3 tK(0.0f,0.0f,0.0f);
+			Vector3 tK(0.0f,0.0f,0.0f);
 			for(int k = 0; k <= n; k++){
 				//tK += bern_poly(n,k,u) * controlPoints[i][j][k];
 				tK += r.bernPolyPack[n][k][2] * controlPoints[i][j][k];
@@ -126,31 +128,31 @@ vector3 tyrFreeFormDef::getGlobalVertice(RectCoord &r,vector3 &S,vector3 &T,vect
 	}
 	return tS;
 }
-void tyrFreeFormDef::reParamVertices(vector<RectCoord> &param, vector3 &S,vector3 &T, vector3 &U){
+void tyrFreeFormDef::reParamVertices(vector<RectCoord> &param, Vector3 &S,Vector3 &T, Vector3 &U){
 	printf("  - Reparameterizing vertices\n");
 
 	int nVtx = _ply.GetNumVertices();
 	point3D_t *vtx = _ply.GetVertices();
 
-	vector3 min = _ply.GetMin();
-	vector3 p0 = min;
-	vector3 max = _ply.GetMax();
+	Vector3 min = _ply.GetMin();
+	Vector3 p0 = min;
+	Vector3 max = _ply.GetMax();
 
-	S = vector3(max.x - min.x,0.0,0.0);
-	T = vector3(0.0,max.y - min.y,0.0);
-	U = vector3(0.0,0.0,max.z - min.z);
+	S = Vector3(max.x - min.x,0.0,0.0);
+	T = Vector3(0.0,max.y - min.y,0.0);
+	U = Vector3(0.0,0.0,max.z - min.z);
 
 
-	vector3 TcU = T.Cross(U);
-	vector3 ScU = S.Cross(U);
-	vector3 ScT = S.Cross(T);
+	Vector3 TcU = T.Cross(U);
+	Vector3 ScU = S.Cross(U);
+	Vector3 ScT = S.Cross(T);
 
 	double TcUdS = TcU.Dot(S);
 	double ScUdT = ScU.Dot(T);
 	double ScTdU = ScT.Dot(U);
 
 	for(int v = 0; v < nVtx; v++){
-		vector3 diff = vtx[v].ToVector3() - p0;
+		Vector3 diff = vtx[v].ToVector3() - p0;
 
 		RectCoord tmp;
 		tmp.s = TcU.Dot(diff/TcUdS);
@@ -178,7 +180,7 @@ void tyrFreeFormDef::reParamVertices(vector<RectCoord> &param, vector3 &S,vector
 	}
 	for(int i = 0; i <= 5; i++){
 		for(int j = 0; j <= 5; j++){
-			vector3 tK(0.0f,0.0f,0.0f);
+			Vector3 tK(0.0f,0.0f,0.0f);
 			for(int k = 0; k <= 5; k++){
 				controlPoints[i][j][k] = createControlPoint(min,i,j,k,S,T,U);
 				
@@ -201,7 +203,7 @@ void tyrFreeFormDef::updateAnimation(double dt){
 		
 		for(int i = 0; i <= 5; i++){
 			for(int j = 0; j <= 5; j++){
-				vector3 tK(0.0f,0.0f,0.0f);
+				Vector3 tK(0.0f,0.0f,0.0f);
 				for(int k = 0; k <= 5; k++){
 					controlPoints[i][j][k].update(totalTime);
 					
@@ -211,23 +213,29 @@ void tyrFreeFormDef::updateAnimation(double dt){
 		transformVertices();
 	}
 }
-void tyrFreeFormDef::render(double dt){
+void tyrFreeFormDef::render(double dt,bool bDrawControls){
 	
 	glColor3f(0.5f, 0.5f, 0.5f);
 
 	Face *faces = _ply.GetFaces();
 	int nFace = _ply.GetNumFaces();
 
+	if(!faces){
+		printf("[ERROR] - No faces found\n");
+		return;
+	}
+	
 
 	for(int f = 0; f< nFace; f++){
-		vector3 pt[3];
+		Vector3 pt[3];
+	
 		pt[0] = vtxTransform[faces[f].verts[0]];
 		pt[1] = vtxTransform[faces[f].verts[1]];
 		pt[2] = vtxTransform[faces[f].verts[2]];
 		
-		vector3 edge1 = pt[1] - pt[0];
-		vector3 edge2 = pt[2] - pt[0];
-		vector3 normal = edge1.Cross(edge2);
+		Vector3 edge1 = pt[1] - pt[0];
+		Vector3 edge2 = pt[2] - pt[0];
+		Vector3 normal = edge1.Cross(edge2);
 		normal.Normalize();
 		
 		
@@ -238,7 +246,8 @@ void tyrFreeFormDef::render(double dt){
 			glVertex3f(pt[2].x,pt[2].y,pt[2].z);
 		glEnd();
 	}
-/*
+	if(!bDrawControls)return;
+
 	for(int i = 0; i <= l; i++){
 		for(int j = 0; j <= m; j++){
 			for(int k = 0; k <= n; k++){
@@ -250,13 +259,13 @@ void tyrFreeFormDef::render(double dt){
 			}
 		}
 	}
-*/
+
 }
-bool tyrFreeFormDef::setControlPoint(int i,int j,int k,tdio_library::vector3 v){
+bool tyrFreeFormDef::setControlPoint(int i,int j,int k,tdio_library::Vector3 v){
 	controlPoints[i][j][k] = v;
 	return true;
 }
-bool tyrFreeFormDef::transControlPoint(int i,int j,int k,tdio_library::vector3 v){
+bool tyrFreeFormDef::transControlPoint(int i,int j,int k,tdio_library::Vector3 v){
 	controlPoints[i][j][k] += v;
 	return true;
 }

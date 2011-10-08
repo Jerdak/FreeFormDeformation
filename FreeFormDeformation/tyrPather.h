@@ -23,7 +23,7 @@ namespace Tyr{
 		}
 
 		int frame;
-		tdio_library::vector3 point;
+		tdio_library::Vector3 point;
 		
 		double time_stamp;
 
@@ -59,11 +59,11 @@ namespace Tyr{
 		tyrPather(void);
 		~tyrPather(void);
 		
-		void addFeaturePoint(const tdio_library::vector3 &pt);
+		void addFeaturePoint(const tdio_library::Vector3 &pt);
 		bool buildPath();
 		void dbgDrawPathToBmp(const std::string &name);
 			
-		bool getPoint(const float &time, tdio_library::vector3 &pt, double &offset, double t1=0.25f,double t2=0.75f);
+		bool getPoint(const float &time, tdio_library::Vector3 &pt, double &offset, double t1=0.25f,double t2=0.75f);
 		
 		void setGranularity(const double &d){_granularity = d;}
 		void setPathType(PATH_TYPE t){_type = t;}
@@ -75,7 +75,7 @@ namespace Tyr{
 	protected:
 		PATH_TYPE _type;
 		tyrPath	_path;
-		std::vector<tdio_library::vector3> _featurePoints;
+		std::vector<tdio_library::Vector3> _featurePoints;
 		double _granularity;
 	};
 };

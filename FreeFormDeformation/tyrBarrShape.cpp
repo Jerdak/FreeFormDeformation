@@ -1,5 +1,6 @@
+#include "stdafx.h"
 #include "tyrBarrShape.h"
-#include <glut.h>
+
 
 using namespace tdio_library;
 using namespace std;
@@ -13,8 +14,8 @@ tyrBarrShape::~tyrBarrShape(void)
 }
 void tyrBarrShape::dbgAnimation(){
 	bAnimate = true;
-	_path.addFeaturePoint(vector3(0,0,0));
-	_path.addFeaturePoint(vector3(0,360,0));
+	_path.addFeaturePoint(Vector3(0,0,0));
+	_path.addFeaturePoint(Vector3(0,360,0));
 	_path.buildPath();
 }
 bool tyrBarrShape::loadPly(const std::string file){
@@ -27,25 +28,25 @@ bool tyrBarrShape::loadPly(const std::string file){
 	transformVertices();
 	return true;
 }
-void tyrBarrShape::chainTransformVertices(std::vector<tdio_library::vector3> *vtx){
+void tyrBarrShape::chainTransformVertices(std::vector<tdio_library::Vector3> *vtx){
 	vtxTransform.clear();
 	
-	vector3 min = _ply.GetMin();
-	vector3 max = _ply.GetMax();
-	vector3 range = max - min;
+	Vector3 min = _ply.GetMin();
+	Vector3 max = _ply.GetMax();
+	Vector3 range = max - min;
 
 
 	for(int i = 0; i < vtx->size(); i++){
-		vector3 p = (*vtx)[i];
+		Vector3 p = (*vtx)[i];
 		double offset = p.y - min.y;
 		offset /= (max.y-min.y);
 		
-		matrix3 mat;
+		Matrix3 mat;
 		mat.FromEulerAnglesXYZ(0,_twistAngle * offset,0);
 
-		vector3 p2 = mat * p;
+		Vector3 p2 = mat * p;
 		vtxTransform.push_back(p2);
-		//vector3 P = getGlobalVertice(vtxParam[i],S,T,U);
+		//Vector3 P = getGlobalVertice(vtxParam[i],S,T,U);
 		//vtxTransform.push_back(P);
 	}
 }
@@ -54,20 +55,20 @@ void tyrBarrShape::transformVertices(){
 	point3D_t *vtx = _ply.GetVertices();
 	int nVtx = _ply.GetNumVertices();
 
-	vector3 min = _ply.GetMin();
-	vector3 max = _ply.GetMax();
-	vector3 range = max - min;
+	Vector3 min = _ply.GetMin();
+	Vector3 max = _ply.GetMax();
+	Vector3 range = max - min;
 
 
 	for(int i = 0; i < nVtx; i++){
-		vector3 p = vtx[i];
+		Vector3 p = vtx[i];
 		double offset = p.y - min.y;
 		offset /= (max.y-min.y);
 		
-		matrix3 mat;
+		Matrix3 mat;
 		mat.FromEulerAnglesXYZ(0,_twistAngle * offset,0);
 
-		vector3 p2 = mat * p;
+		Vector3 p2 = mat * p;
 		vtxTransform.push_back(p2);
 
 	}
@@ -83,7 +84,7 @@ void tyrBarrShape::updateAnimation(double dt,bool manualApply){
 			deltaDir *= -1.0f;
 			_elapsedTime = 0.0f;
 		}
-		vector3 p;
+		Vector3 p;
 		double offset;
 		_path.getPoint(_elapsedTime,p,offset,0,1);
 
@@ -100,14 +101,14 @@ void tyrBarrShape::render(double dt){
 	int nFace = _ply.GetNumFaces();
 
 	for(int f = 0; f< nFace; f++){
-		vector3 pt[3];
+		Vector3 pt[3];
 		pt[0] = vtxTransform[faces[f].verts[0]];
 		pt[1] = vtxTransform[faces[f].verts[1]];
 		pt[2] = vtxTransform[faces[f].verts[2]];
 		
-		vector3 edge1 = pt[1] - pt[0];
-		vector3 edge2 = pt[2] - pt[0];
-		vector3 normal = edge1.Cross(edge2);
+		Vector3 edge1 = pt[1] - pt[0];
+		Vector3 edge2 = pt[2] - pt[0];
+		Vector3 normal = edge1.Cross(edge2);
 		normal.Normalize();
 		
 		

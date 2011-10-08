@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "tyrPather.h"
 
 using namespace Tyr;
@@ -10,7 +11,7 @@ tyrPather::tyrPather(void):_type(PATH_LINEAR),_granularity(0.1f)
 tyrPather::~tyrPather(void)
 {
 }
-void tyrPather::addFeaturePoint(const tdio_library::vector3 &pt){
+void tyrPather::addFeaturePoint(const tdio_library::Vector3 &pt){
 	_featurePoints.push_back(pt);
 }
 
@@ -36,13 +37,13 @@ bool tyrPather::buildBezierPath(){
 	printf("  - Creating points along curve....");
 
 	for(int c = 0; c < _featurePoints.size()-3; c++){
-		vector3 p0,p1,p2,p3;
+		Vector3 p0,p1,p2,p3;
 		p0 = _featurePoints[c];
 		p1 = _featurePoints[c+1];
 		p2 = _featurePoints[c+2];
 		p3 = _featurePoints[c+3];
 		for(float i = 0; i <= 1; i+=_granularity){
-			vector3 pt;
+			Vector3 pt;
 			pt.x = calc_cat(i,p0.x,p1.x,p2.x,p3.x);
 			pt.y = calc_cat(i,p0.y,p1.y,p2.y,p3.y);
 			pt.z = calc_cat(i,p0.z,p1.z,p2.z,p3.z);
@@ -57,7 +58,7 @@ bool tyrPather::buildBezierPath(){
 				if(_path._elems.size()==0){
 					elem->dist_from_last = 0.0;
 				} else {
-					vector3 ptLast = _path._elems[elem->frame-1]->point;
+					Vector3 ptLast = _path._elems[elem->frame-1]->point;
 					double tmpDist = abs(pt.Dist(ptLast));
 					elem->dist_from_last = tmpDist;
 					_path._pathLength += tmpDist;
@@ -134,14 +135,14 @@ bool tyrPather::buildLinearPath(){
 	printf("  - Creating points along curve....");
 
 	for(int c = 0; c < _featurePoints.size()-1; c++){
-		vector3 p0,p1;
+		Vector3 p0,p1;
 		p0 = _featurePoints[c];
 		p1 = _featurePoints[c+1];
 
 		Ray ray(p0,p1-p0);
 
 		for(float i = 0; i <= 1; i+=_granularity){
-			vector3 pt;
+			Vector3 pt;
 			pt = ray.GetPoint(i);
 
 			{	///Create new element
@@ -154,7 +155,7 @@ bool tyrPather::buildLinearPath(){
 				if(_path._elems.size()==0){
 					elem->dist_from_last = 0.0;
 				} else {
-					vector3 ptLast = _path._elems[elem->frame-1]->point;
+					Vector3 ptLast = _path._elems[elem->frame-1]->point;
 					double tmpDist = abs(pt.Dist(ptLast));
 					elem->dist_from_last = tmpDist;
 					_path._pathLength += tmpDist;
@@ -216,7 +217,7 @@ bool tyrPather::buildLinearPath(){
 	printf("  - # of frames: %d\n",_path._elems.size());
 	return true;
 }
-bool tyrPather::getPoint(const float &aTime, vector3 &pt, double &offset, double t1, double t2){
+bool tyrPather::getPoint(const float &aTime, Vector3 &pt, double &offset, double t1, double t2){
 	double time = aTime;
 	if(time > 1.0f){
 		return false;
@@ -247,8 +248,8 @@ bool tyrPather::getPoint(const float &aTime, vector3 &pt, double &offset, double
 
 		if(totalDist >= maxDist){
 			if(elemLast){
-				vector3 pt1 = elemLast->point;
-				vector3 pt2 = elem->point;
+				Vector3 pt1 = elemLast->point;
+				Vector3 pt2 = elem->point;
 				Ray ray(pt1,pt2-pt1);
 
 				double nextDist = totalDist;
@@ -293,9 +294,9 @@ void tyrPather::dbgDrawPathToBmp(const std::string &name){
 
 	while(iter != _path._elems.end()){
 		tyrPathElement *elem = (*iter);
-		vector3 pt = elem->point;
+		Vector3 pt = elem->point;
 		if(elem->frame + 1 < _path._elems.size()){
-			vector3 pt2 = _path._elems[elem->frame+1]->point;
+			Vector3 pt2 = _path._elems[elem->frame+1]->point;
 			image.draw_line((int)pt.x,400-(int)pt.y,(int)pt2.x,400-(int)pt2.y,red);
 		}
 		iter++;

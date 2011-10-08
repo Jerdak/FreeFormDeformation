@@ -1,11 +1,12 @@
+#include "stdafx.h"
 #include "tyrNode.h"
-#include <glut.h>
+
 using namespace std;
 using namespace tdio_library;
 
 tyrNode::tyrNode(void):_parent(NULL),_bTriggerParentUpdate(false)
 {
-	_localPosition = vector3::ZERO;
+	_localPosition = Vector3::ZERO;
 	_localOrientation = quaternion::IDENTITY;
 	_globalOrientation = quaternion::IDENTITY;
 
@@ -44,7 +45,7 @@ void tyrNode::clearObjects(){
 	_objects.clear();
 }
 
-void ToRealArray4_2(matrix3 mat,float ret[16]){
+void ToRealArray4_2(Matrix3 mat,float ret[16]){
 	for(int r = 0; r < 3; r++){
 		for(int c = 0; c < 3; c++){
 			ret[c * 4 + r] = mat.m[r][c];
@@ -55,11 +56,11 @@ void ToRealArray4_2(matrix3 mat,float ret[16]){
 }
 void tyrNode::render(double dt){
 	quaternion o	= _globalOrientation;
-	vector3 p		= _globalPosition;
-	matrix3 mat;
+	Vector3 p		= _globalPosition;
+	Matrix3 mat;
 	float realMat[16];
 
-	o.toRotationMatrix(mat);
+	o.ToRotationMatrix(mat);
 	//mat.ToRealArray4(realMat);
 	ToRealArray4_2(mat,realMat);
 
@@ -85,7 +86,7 @@ void tyrNode::render(double dt){
 void tyrNode::rotate(const quaternion& q,Rotation_Center r){
 	// Normalise quaternion to avoid drift
 	quaternion qnorm = q;
-	qnorm.normalize();
+	qnorm.Normalize();
 	//printf("[%s] RPY Before: %f %f %f\n",_name.c_str(),_globalOrientation.getRoll(),_globalOrientation.getPitch(),_globalOrientation.getYaw());
 
     switch(r){
@@ -95,7 +96,7 @@ void tyrNode::rotate(const quaternion& q,Rotation_Center r){
 			break;
 		case RC_WORLD:
 			// Rotations are normally relative to local axes, transform up
-			_localOrientation = _localOrientation * getGlobalOrientation().inverse()* qnorm * getGlobalOrientation();
+			_localOrientation = _localOrientation * getGlobalOrientation().Inverse()* qnorm * getGlobalOrientation();
 			break;
 		case RC_LOCAL:
 			// Note the order of the mult, i.e. q comes after
@@ -106,9 +107,9 @@ void tyrNode::rotate(const quaternion& q,Rotation_Center r){
 
 
 }
-void tyrNode::translate(const vector3& v,Rotation_Center r){
+void tyrNode::translate(const Vector3& v,Rotation_Center r){
 //	printf("\n\n");
-	vector3 tVec;
+	Vector3 tVec;
 //	printf("Local Position Before: %f %f %f\n",_localPosition.x,_localPosition.y,_localPosition.z);
     switch(r){
 		case RC_PARENT:
@@ -119,7 +120,7 @@ void tyrNode::translate(const vector3& v,Rotation_Center r){
 		case RC_WORLD:
 			 // position is relative to parent so transform upwards
             if (_parent) {
-		        _localPosition += (_parent->getGlobalOrientation().inverse() * v);
+		        _localPosition += (_parent->getGlobalOrientation().Inverse() * v);
             } else {
 		        _localPosition = _localPosition + v;
             }
@@ -161,6 +162,6 @@ void tyrNode::applyParent(void)
 		_globalPosition		= _localPosition;
     }
 	printf("[%s] Pos: %f %f %f\n",_name.c_str(),_globalPosition.x,_globalPosition.y,_globalPosition.z);
-	printf("[%s] RPY: %f %f %f\n",_name.c_str(),_globalOrientation.getRoll(),_globalOrientation.getPitch(),_globalOrientation.getYaw());
+	printf("[%s] RPY: %f %f %f\n",_name.c_str(),_globalOrientation.GetRoll(),_globalOrientation.GetPitch(),_globalOrientation.GetYaw());
 
 }

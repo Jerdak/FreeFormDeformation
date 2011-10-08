@@ -24,7 +24,7 @@ public:
 	void render(double dt);
 
 	void transformVertices();
-	void chainTransformVertices(std::vector<tdio_library::vector3> *vtx);
+	void chainTransformVertices(std::vector<tdio_library::Vector3> *vtx);
 
 	void updateAnimation(double dt,bool manualApply=false);
 	void twist(double angle){_twistAngle += angle;}
@@ -40,7 +40,7 @@ protected:
 	tdio_library::Object<tdio_library::PLY> _ply;
 
 	///Bezier transformed vertices
-	std::vector<tdio_library::vector3> vtxTransform;
+	std::vector<tdio_library::Vector3> vtxTransform;
 
 	Tyr::tyrPather _path;
 
